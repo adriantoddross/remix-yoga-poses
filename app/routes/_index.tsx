@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import { useState } from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,6 +9,8 @@ export const meta: MetaFunction = () => {
 };
 
 const yogaPoses = [
+  // TODO: Add categories to each pose
+  // TODO: Add these to DB on Hasura
   {
     name: "Mountain Pose (Tadasana)",
     description:
@@ -61,12 +64,34 @@ const yogaPoses = [
 ];
 
 export default function Index() {
-  const handleFilterToggle = (event) =>
-    console.log(
-      `${event.target.name} ${
-        event.target.checked ? "selected" : "unselected"
-      }!`
-    );
+  const [favoritePoses, setFavoritePoses] = useState<string[]>([]);
+  const [filters, setFilters] = useState<string[]>([]);
+
+  const handleToggleFilter = (event) => {
+    if (filters.includes(`${event.target.name}`)) {
+      setFilters(
+        [...filters].filter((name) => name !== `${event.target.name}`)
+      );
+
+      return console.log(`❌ ${event.target.name} checked!`);
+    }
+
+    setFilters([...filters, `${event.target.name}`]);
+    return console.log(`✅ ${event.target.name} checked!!`);
+  };
+
+  const handleFavoritePose = (event) => {
+    if (favoritePoses.includes(`${event.target.name}`)) {
+      setFavoritePoses(
+        [...favoritePoses].filter((name) => name !== `${event.target.name}`)
+      );
+
+      return console.log(`❌ ${event.target.name} un-favorited!`);
+    }
+
+    setFavoritePoses([...favoritePoses, `${event.target.name}`]);
+    return console.log(`✅ ${event.target.name} favorited!`);
+  };
 
   return (
     <div>
@@ -100,7 +125,7 @@ export default function Index() {
                 type="checkbox"
                 name="filter1"
                 id=""
-                onChange={handleFilterToggle}
+                onChange={handleToggleFilter}
               />
             </label>
             <label>
@@ -109,7 +134,7 @@ export default function Index() {
                 type="checkbox"
                 name="filter2"
                 id=""
-                onChange={handleFilterToggle}
+                onChange={handleToggleFilter}
               />
             </label>
             <label>
@@ -118,7 +143,7 @@ export default function Index() {
                 type="checkbox"
                 name="filter3"
                 id=""
-                onChange={handleFilterToggle}
+                onChange={handleToggleFilter}
               />
             </label>
           </fieldset>
@@ -126,14 +151,14 @@ export default function Index() {
         <div>
           <h2>Poses</h2>
           <ul>
+            {/* TODO: Fetch poses from database */}
             {yogaPoses.map(({ name, description }) => (
               <li key={name}>
-                <h3>{name}</h3>
+                <h3>
+                  {favoritePoses.includes(name) && "❤️"} {name}
+                </h3>
                 <p>{description}</p>
-                <button
-                  type="button"
-                  onClick={() => console.log(`${name} liked!`)}
-                >
+                <button type="button" onClick={handleFavoritePose} name={name}>
                   Like
                 </button>
               </li>
