@@ -16,14 +16,14 @@ type Sequence = {
   poses: Array<PoseMutation["id"]>;
 };
 
-export type PoseRecord = PoseMutation & {
+type PoseRecord = PoseMutation & {
   createdAt: string;
   id: string;
 };
 
-export async function getPoses(query?: string | null) {
+export async function getPoses() {
   await new Promise((resolve) => setTimeout(resolve, 500));
-  let poses = await fakePoses.getAll();
+  const poses = await fakePoses.getAll();
   return poses;
 }
 
@@ -39,7 +39,7 @@ const fakePoses = {
   },
 
   async getAll(): Promise<PoseRecord[]> {
-    return Object.keys(fakePoses.records).map((key) => fakePoses.records[key];
+    return Object.keys(fakePoses.records).map((key) => fakePoses.records[key]);
   },
 };
 
