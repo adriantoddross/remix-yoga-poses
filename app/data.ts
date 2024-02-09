@@ -1,6 +1,39 @@
-export const fakeYogaPoses = [
-  // TODO: Add categories to each pose
-  // TODO: Add poses to NeonDB on Hasura; reference
+// TODO: Replace Fake DB and its methods with GraphQL queries and mutations
+// For poses, reference poses & categories in "Yoga to the Rescue!" book.
+
+type PoseMutation = {
+  description: string;
+  favorite?: boolean;
+  id?: string;
+  name: string;
+  sequence?: Array<Sequence["id"]>;
+};
+
+type Sequence = {
+  description?: string;
+  id?: string;
+  name?: string;
+  poses: Array<PoseMutation["id"]>;
+};
+
+export type PoseRecord = PoseMutation & {
+  createdAt: string;
+  id: string;
+};
+
+const fakePoses = {
+  records: {} as Record<string, PoseRecord>,
+
+  create: async (pose: PoseMutation): Promise<PoseRecord> => {
+    const createdAt = new Date().toISOString();
+    const id = pose.id || Math.random().toString(36).substring(2, 9);
+    const newPose = { id, createdAt, ...pose };
+    fakePoses.records[id] = newPose;
+    return newPose;
+  },
+};
+
+[
   {
     name: "Mountain Pose (Tadasana)",
     description:
@@ -51,4 +84,4 @@ export const fakeYogaPoses = [
     description:
       "Begin on hands and knees. Inhale, arch the back, and lift the head for Cow Pose. Exhale, round the spine, and tuck the chin for Cat Pose. Flow between the two for a gentle spinal stretch.",
   },
-];
+].forEach((pose) => fakePoses.create(pose));
