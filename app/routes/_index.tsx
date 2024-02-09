@@ -88,17 +88,25 @@ export default function Index() {
         <div>
           <h2>Poses</h2>
           <ul>
-            {poses.map(({ id, name, description }) => (
-              <li key={id}>
-                <h3>
-                  {favoritePoses.includes(name) && "❤️"} {name}
-                </h3>
-                <p>{description}</p>
-                <button type="button" onClick={handleFavoritePose} name={name}>
-                  Like
-                </button>
-              </li>
-            ))}
+            {poses.length ? (
+              poses.map(({ id, name, description }) => (
+                <li key={id}>
+                  <h3>
+                    {favoritePoses.includes(name) && "❤️"} {name}
+                  </h3>
+                  <p>{description}</p>
+                  <button
+                    type="button"
+                    onClick={handleFavoritePose}
+                    name={name}
+                  >
+                    Like
+                  </button>
+                </li>
+              ))
+            ) : (
+              <p>No poses</p>
+            )}
           </ul>
         </div>
       </div>
