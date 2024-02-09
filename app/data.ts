@@ -21,15 +21,25 @@ export type PoseRecord = PoseMutation & {
   id: string;
 };
 
+export async function getPoses(query?: string | null) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  let poses = await fakePoses.getAll();
+  return poses;
+}
+
 const fakePoses = {
   records: {} as Record<string, PoseRecord>,
 
-  create: async (pose: PoseMutation): Promise<PoseRecord> => {
+  async create(pose: PoseMutation): Promise<PoseRecord> {
     const createdAt = new Date().toISOString();
     const id = pose.id || Math.random().toString(36).substring(2, 9);
     const newPose = { id, createdAt, ...pose };
     fakePoses.records[id] = newPose;
     return newPose;
+  },
+
+  async getAll(): Promise<PoseRecord[]> {
+    return Object.keys(fakePoses.records).map((key) => fakePoses.records[key];
   },
 };
 
