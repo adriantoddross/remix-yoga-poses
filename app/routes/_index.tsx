@@ -10,7 +10,7 @@ export const meta: MetaFunction = () => {
 
 const yogaPoses = [
   // TODO: Add categories to each pose
-  // TODO: Add these to DB on Hasura
+  // TODO: Add poses to NeonDB on Hasura; reference
   {
     name: "Mountain Pose (Tadasana)",
     description:
@@ -94,24 +94,7 @@ export default function Index() {
   };
 
   return (
-    <div>
-      <header>
-        <h1>Yoga Poses</h1>
-        <nav>
-          <ul>
-            <li>
-              <a href="#">Home</a>
-            </li>
-            <li>
-              <a href="#">About</a>
-            </li>
-            <li>
-              <a href="#">Login</a>
-            </li>
-          </ul>
-        </nav>
-      </header>
-
+    <>
       <div>
         <div>
           <fieldset>
@@ -166,10 +149,6 @@ export default function Index() {
           </ul>
         </div>
       </div>
-
-      <footer>
-        <p>Created by Adrian Ross</p>
-      </footer>
-    </div>
+    </>
   );
 }
