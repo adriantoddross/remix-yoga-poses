@@ -1,7 +1,7 @@
 // TODO: Replace Fake DB and its methods with GraphQL queries and mutations
 // For poses, reference poses & categories in "Yoga to the Rescue!" book.
 
-type PoseMutation = {
+export type PoseMutation = {
   description: string;
   favorite?: boolean;
   id?: string;
@@ -9,16 +9,16 @@ type PoseMutation = {
   sequence?: Array<Sequence["id"]>;
 };
 
+export type PoseRecord = PoseMutation & {
+  createdAt: string;
+  id: string;
+};
+
 type Sequence = {
   description?: string;
   id?: string;
   name?: string;
   poses: Array<PoseMutation["id"]>;
-};
-
-type PoseRecord = PoseMutation & {
-  createdAt: string;
-  id: string;
 };
 
 export async function getPoses() {
