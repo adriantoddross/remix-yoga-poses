@@ -2,12 +2,13 @@ import { PoseRecord } from "~/data";
 import Pose from "./Pose";
 import { useState } from "react";
 import { useLoaderData } from "@remix-run/react";
+import { loader } from "~/routes/_index";
 
 const Poses = () => {
   const { poses } = useLoaderData<typeof loader>();
   const [favoritePoses, setFavoritePoses] = useState<string[]>([]);
 
-  const handleFavoritePose = (event) => {
+  const handleFavoritePose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     if (favoritePoses.includes(`${event.currentTarget.value}`)) {

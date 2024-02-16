@@ -1,7 +1,7 @@
 import { PoseMutation } from "~/data";
 
 type PoseProps = PoseMutation & {
-  handleClick: (event) => void;
+  handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 const Pose = ({ name, id, description, favorite, handleClick }: PoseProps) => {
