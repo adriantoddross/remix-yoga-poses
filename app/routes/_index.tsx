@@ -1,5 +1,5 @@
 import { json, type MetaFunction } from "@remix-run/node";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { getPoses } from "../data";
 import Poses from "~/components/Poses";
 
@@ -17,17 +17,21 @@ export const loader = async () => {
 
 export default function Index() {
   const [filters, setFilters] = useState<string[]>([]);
-  const handleToggleFilter = (event) => {
-    if (filters.includes(`${event.target.name}`)) {
+  const handleToggleFilter = (
+    event: ChangeEvent<HTMLInputElement> & {
+      currentTarget: HTMLInputElement;
+    }
+  ) => {
+    if (filters.includes(`${event.currentTarget.name}`)) {
       setFilters(
-        [...filters].filter((name) => name !== `${event.target.name}`)
+        [...filters].filter((name) => name !== `${event.currentTarget.name}`)
       );
 
-      return console.log(`❌ ${event.target.name} checked!`);
+      return console.log(`❌ ${event.currentTarget.name} checked!`);
     }
 
-    setFilters([...filters, `${event.target.name}`]);
-    return console.log(`✅ ${event.target.name} checked!!`);
+    setFilters([...filters, `${event.currentTarget.name}`]);
+    return console.log(`✅ ${event.currentTarget.name} checked!!`);
   };
 
   return (
