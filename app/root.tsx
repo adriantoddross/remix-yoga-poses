@@ -9,12 +9,17 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { useState } from "react";
+import { PoseRecord } from "./data";
+import { globalContext } from "./context/globalContext";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
 export default function App() {
+  const [favoritePoses, setFavoritePoses] = useState<PoseRecord["id"][]>([]);
+
   return (
     <html lang="en">
       <head>
@@ -44,11 +49,14 @@ export default function App() {
         <footer>
           <p>Created by Adrian Ross</p>
         </footer>
-
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        {/* Usecontext open */}
+        <globalContext.Provider value={{ favoritePoses, setFavoritePoses }}>
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </globalContext.Provider>
+        {/* UseContext close */}
       </body>
     </html>
   );

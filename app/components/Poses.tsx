@@ -1,12 +1,13 @@
 import { PoseRecord } from "~/data";
 import Pose from "./Pose";
-import { useState } from "react";
+import { useContext } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "~/routes/_index";
+import { globalContext } from "~/context/globalContext";
 
 const Poses = () => {
   const { poses } = useLoaderData<typeof loader>();
-  const [favoritePoses, setFavoritePoses] = useState<string[]>([]);
+  const { favoritePoses, setFavoritePoses } = useContext(globalContext);
 
   const handleFavoritePose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
