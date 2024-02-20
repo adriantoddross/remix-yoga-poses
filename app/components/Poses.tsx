@@ -6,7 +6,7 @@ import { loader } from "~/routes/_index";
 import { globalContext } from "~/context/globalContext";
 
 const Poses = () => {
-  const { poses } = useLoaderData<typeof loader>();
+  const { posesData } = useLoaderData<typeof loader>();
   const { favoritePoses, setFavoritePoses } = useContext(globalContext);
 
   const handleFavoritePose = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -23,8 +23,8 @@ const Poses = () => {
 
   return (
     <ul>
-      {poses.length ? (
-        poses.map(({ name, id, description }: PoseRecord) => (
+      {posesData.length ? (
+        posesData.map(({ name, id, description }: PoseRecord) => (
           <li key={id}>
             <Pose
               id={id}

@@ -11,8 +11,8 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const poses = await getPoses();
-  return json({ poses });
+  const posesData = await getPoses();
+  return json({ posesData });
 };
 
 export default function Index() {
