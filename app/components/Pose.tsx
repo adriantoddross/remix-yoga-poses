@@ -1,7 +1,7 @@
 import { PoseMutation } from "~/data";
 
 type PoseProps = PoseMutation & {
-  handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 const Pose = ({ name, id, description, favorite, handleClick }: PoseProps) => {
@@ -9,9 +9,11 @@ const Pose = ({ name, id, description, favorite, handleClick }: PoseProps) => {
     <>
       <h3>{favorite ? `❤️ ${name}` : name}</h3>
       <p>{description}</p>
-      <button type="button" onClick={handleClick} name={name} value={id}>
-        Like
-      </button>
+      {handleClick ? (
+        <button type="button" onClick={handleClick} name={name} value={id}>
+          Like
+        </button>
+      ) : null}
     </>
   );
 };
