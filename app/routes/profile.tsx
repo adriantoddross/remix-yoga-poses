@@ -1,7 +1,7 @@
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useContext } from "react";
-import Pose from "~/components/Pose";
+import Poses from "~/components/Poses";
 import { globalContext } from "~/context/globalContext";
 import { getPoses, PoseRecord } from "~/data";
 
@@ -24,21 +24,12 @@ export default function Index() {
     favoritePoses.includes(id)
   );
 
-  console.log(favoritePoses);
-  console.log(filteredPoses);
-
   return (
     <body>
       <h2>Profile page</h2>
       <div>
         <h3>Favorite Poses</h3>
-        {filteredPoses.map((pose) => (
-          <Pose
-            key={pose.id}
-            {...pose}
-            favorite={favoritePoses.includes(pose.id)}
-          />
-        ))}
+        {filteredPoses.length ? <Poses poses={filteredPoses} /> : null}
       </div>
     </body>
   );
