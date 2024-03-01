@@ -2,6 +2,7 @@ import { json, type MetaFunction } from "@remix-run/node";
 import { ChangeEvent, useState } from "react";
 import { getPoses } from "../data";
 import Poses from "~/components/Poses";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -35,7 +36,23 @@ export default function Index() {
   };
 
   return (
-    <div>
+    <>
+      <header>
+        <h1>Yoga Poses</h1>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/signup">Signup</Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
       <div>
         <fieldset>
           <legend>
@@ -75,6 +92,6 @@ export default function Index() {
         <h2>Poses</h2>
         <Poses />
       </div>
-    </div>
+    </>
   );
 }
