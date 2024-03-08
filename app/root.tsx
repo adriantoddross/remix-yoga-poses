@@ -1,5 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Link,
   Links,
@@ -8,16 +8,33 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  json,
+  useLoaderData,
 } from "@remix-run/react";
 import { useState } from "react";
 import { PoseRecord } from "./data";
 import { globalContext } from "./context/globalContext";
+import { createBrowserClient } from "@supabase/auth-helpers-remix";
+import type { Database } from "db_types";
+
+export const loader = ({}: LoaderFunctionArgs) => {
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  };
+
+  return json({ env });
+};
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
 export default function App() {
+  const { env } = useLoaderData<typeof loader>();
+  const [supabase] = useState(() =>
+    createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+  );
   const [favoritePoses, setFavoritePoses] = useState<PoseRecord["id"][]>([]);
 
   return (
@@ -51,7 +68,7 @@ export default function App() {
         </footer>
         {/* Usecontext open */}
         <globalContext.Provider value={{ favoritePoses, setFavoritePoses }}>
-          <Outlet />
+          <Outlet context={{ supabase }} />
           <ScrollRestoration />
           <Scripts />
           <LiveReload />
