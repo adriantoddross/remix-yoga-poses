@@ -8,17 +8,36 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  // useState for email
+  // useState for password
+  // useState for form errors
+
+  // handleEmailField
+
+  // handlePasswordField
+
+  // handleFormSubmit
+
   return (
     <form action="">
-      <label>
-        E-mail address
-        <input type="text" name="email" id="email" />
-      </label>
+      <div>
+        <label>
+          E-mail address
+          <input type="text" name="email" id="email" />
+        </label>
+        {/* TODO: display validation errors */}
+      </div>
 
-      <label>
-        Password
-        <input type="text" name="password" id="password" />
-      </label>
+      <div>
+        <label>
+          Password
+          <input type="text" name="password" id="password" />
+        </label>
+        {/* TODO: display validation errors */}
+      </div>
+
+      {/* TODO: display Supabase errors */}
+
       <button type="submit">Sign up</button>
     </form>
   );
