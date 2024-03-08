@@ -1,4 +1,5 @@
 import { type MetaFunction } from "@remix-run/node";
+import { useState } from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,22 +9,36 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  // useState for email
-  // useState for password
-  // useState for form errors
+  const [formValues, setFormValues] = useState<{
+    email: string;
+    password: string;
+  }>({ email: "", password: "" });
+  // TODO: useState for form errors
 
-  // handleEmailField
+  const handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const { name, value } = e.currentTarget;
 
-  // handlePasswordField
+    setFormValues({ ...formValues, [name]: value });
+  };
 
-  // handleFormSubmit
+  const handleFormSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    // TODO: handle validation errors
+    console.log("Submitting...", formValues);
+  };
 
   return (
     <form action="">
       <div>
         <label>
           E-mail address
-          <input type="text" name="email" id="email" />
+          <input
+            type="text"
+            name="email"
+            id="email"
+            onChange={handleInputChange}
+          />
         </label>
         {/* TODO: display validation errors */}
       </div>
@@ -31,14 +46,21 @@ export default function Index() {
       <div>
         <label>
           Password
-          <input type="text" name="password" id="password" />
+          <input
+            type="text"
+            name="password"
+            id="password"
+            onChange={handleInputChange}
+          />
         </label>
         {/* TODO: display validation errors */}
       </div>
 
       {/* TODO: display Supabase errors */}
 
-      <button type="submit">Sign up</button>
+      <button type="submit" onClick={handleFormSubmit}>
+        Sign up
+      </button>
     </form>
   );
 }

@@ -108,7 +108,10 @@ export default function App() {
                 <Link to="/about">About</Link>
               </li>
               <li>
-                <Link to="/profile">Login</Link>
+                <Link to="/signup">Sign up</Link>
+              </li>
+              <li>
+                <Link to="/profile">Profile</Link>
               </li>
             </ul>
           </nav>
