@@ -19,7 +19,6 @@ import {
   createBrowserClient,
   createServerClient,
 } from "@supabase/auth-helpers-remix";
-import type { Database } from "db_types";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const env = {
@@ -62,7 +61,7 @@ export default function App() {
   const { revalidate } = useRevalidator();
 
   const [supabase] = useState(() =>
-    createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+    createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
   );
 
   const serverAccessToken = session?.access_token;
