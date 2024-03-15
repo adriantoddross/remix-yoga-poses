@@ -21,6 +21,8 @@ export default function Index() {
   }>({ email: "", password: "" });
   const [formErrors, setFormErrors] = useState<string[]>([]);
 
+  const resetFormValues = () => setFormValues({ email: "", password: "" });
+
   const handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.currentTarget;
@@ -44,7 +46,8 @@ export default function Index() {
     }
 
     if (data.user) {
-      console.log("User created!");
+      resetFormValues();
+      redirect("http://localhost:3000/profile");
     }
   };
 
@@ -52,15 +55,18 @@ export default function Index() {
   const emptyFormFields = !formValues.email || !formValues.password;
 
   return (
-    <form action="">
+    <form>
+      {/* TODO: Replace with React Final Form */}
       <div>
         <label>
           E-mail address
           <input
-            type="text"
-            name="email"
             id="email"
+            minLength={3}
+            name="email"
             onChange={handleInputChange}
+            required
+            type="text"
           />
         </label>
         {/* TODO: display validation errors */}
@@ -70,18 +76,22 @@ export default function Index() {
         <label>
           Password
           <input
-            type="text"
-            name="password"
             id="password"
+            minLength={8}
+            name="password"
             onChange={handleInputChange}
+            required
+            type="text"
           />
         </label>
         {/* TODO: display validation errors */}
       </div>
 
-      {isFormError
-        ? formErrors.map((error) => <p key={error}>{error}</p>)
-        : null}
+      <div>
+        {isFormError
+          ? formErrors.map((error) => <p key={error}>{error}</p>)
+          : null}
+      </div>
 
       <button
         type="submit"
