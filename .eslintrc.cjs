@@ -23,6 +23,11 @@ module.exports = {
   // Base config
   extends: ["eslint:recommended"],
 
+  rules: {
+    // turn on errors for missing imports
+    "import/no-unresolved": "error",
+  },
+
   overrides: [
     // React
     {
@@ -60,6 +65,9 @@ module.exports = {
           typescript: {
             alwaysTryTypes: true,
           },
+        },
+        "import/parsers": {
+          "@typescript-eslint/parser": [".ts", ".tsx"],
         },
       },
       extends: [
