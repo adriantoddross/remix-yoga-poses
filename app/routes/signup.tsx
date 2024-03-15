@@ -1,5 +1,5 @@
 import { redirect, type MetaFunction } from "@remix-run/node";
-import { useOutletContext } from "@remix-run/react";
+import { Link, useOutletContext } from "@remix-run/react";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { useState } from "react";
 
@@ -14,6 +14,15 @@ export default function Index() {
   const { supabase } = useOutletContext<{
     supabase: SupabaseClient;
   }>();
+
+  const getUser = async () => {
+    return await supabase.auth
+      .getSession()
+      .then((user) => user.data.session?.user)
+      .catch((error) => setFormErrors([error]));
+  };
+
+  const userIsLoggedIn = !!getUser();
 
   const [formValues, setFormValues] = useState<{
     email: string;
@@ -33,8 +42,9 @@ export default function Index() {
   const handleFormSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     // TODO: handle validation errors
     e.preventDefault();
+    resetFormValues();
+
     const { email, password } = formValues;
-    console.log("Submitting...", formValues);
 
     const { data, error } = await supabase.auth.signUp({
       email: email,
@@ -45,16 +55,31 @@ export default function Index() {
       setFormErrors([error.message]);
     }
 
-    if (data.user) {
-      resetFormValues();
+    if (data.user || data.session) {
       redirect("http://localhost:3000/profile");
+      // TODO: Send user to welcome page
+      // This doesn't do anything ATM.
     }
   };
 
   const isFormError = formErrors.length;
   const emptyFormFields = !formValues.email || !formValues.password;
 
-  return (
+  return userIsLoggedIn ? (
+    <div>
+      <h2>You're already logged in.</h2>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/">Go home</Link>
+          </li>
+          <li>
+            <Link to="/profile">View your profile</Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  ) : (
     <form>
       {/* TODO: Replace with React Final Form */}
       <div>
@@ -91,12 +116,13 @@ export default function Index() {
         {isFormError
           ? formErrors.map((error) => <p key={error}>{error}</p>)
           : null}
+        {userIsLoggedIn ? <p>You are already logged in. </p> : null}
       </div>
 
       <button
         type="submit"
         onClick={handleFormSubmit}
-        disabled={emptyFormFields}
+        disabled={emptyFormFields || userIsLoggedIn}
       >
         Sign up
       </button>
