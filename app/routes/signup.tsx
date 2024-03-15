@@ -67,7 +67,7 @@ export default function Index() {
 
   return userIsLoggedIn ? (
     <div>
-      <h2>You're already logged in.</h2>
+      <h2>You&apos;re already logged in.</h2>
       <nav>
         <ul>
           <li>
