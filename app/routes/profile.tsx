@@ -25,12 +25,12 @@ export default function Index() {
   );
 
   return (
-    <body>
+    <>
       <h2>Profile page</h2>
       <div>
         <h3>Favorite Poses</h3>
         {filteredPoses.length ? <Poses poses={filteredPoses} /> : null}
       </div>
-    </body>
+    </>
   );
 }

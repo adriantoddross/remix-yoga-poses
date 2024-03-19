@@ -1,7 +1,34 @@
-import { redirect, type MetaFunction } from "@remix-run/node";
-import { Link, useOutletContext } from "@remix-run/react";
+import {
+  redirect,
+  type MetaFunction,
+  json,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
+import { Link, useLoaderData, useOutletContext } from "@remix-run/react";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { useState } from "react";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const response = new Response();
+
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    {
+      request,
+      response,
+    }
+  );
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  return json({
+    session,
+  });
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,19 +37,14 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+export default function SignUp() {
   const { supabase } = useOutletContext<{
     supabase: SupabaseClient;
   }>();
 
-  const getUser = async () => {
-    return await supabase.auth
-      .getSession()
-      .then((user) => user.data.session?.user)
-      .catch((error) => setFormErrors([error]));
-  };
+  const { session } = useLoaderData<typeof loader>();
 
-  const userIsLoggedIn = !!getUser();
+  const userIsLoggedIn = session;
 
   const [formValues, setFormValues] = useState<{
     email: string;
@@ -57,8 +79,6 @@ export default function Index() {
 
     if (data.user || data.session) {
       redirect("http://localhost:3000/profile");
-      // TODO: Send user to welcome page
-      // This doesn't do anything ATM.
     }
   };
 

@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
   json,
+  redirect,
   useLoaderData,
   useRevalidator,
 } from "@remix-run/react";
@@ -86,6 +87,17 @@ export default function App() {
 
   const [favoritePoses, setFavoritePoses] = useState<PoseRecord["id"][]>([]);
 
+  const userIsLoggedIn = session?.user;
+
+  const handleLogout = async () => {
+    await supabase.auth
+      .signOut()
+      .then(() => redirect("/"))
+      .catch((error) => {
+        throw new Error(error?.message);
+      });
+  };
+
   return (
     <html lang="en">
       <head>
@@ -106,26 +118,38 @@ export default function App() {
               <li>
                 <Link to="/about">About</Link>
               </li>
-              <li>
-                <Link to="/signup">Sign up</Link>
-              </li>
-              <li>
-                <Link to="/profile">Profile</Link>
-              </li>
+
+              {userIsLoggedIn ? (
+                <>
+                  <li>
+                    <Link to="/profile">Profile</Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}>Log out</button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link to="/signup">Sign up</Link>
+                  </li>
+                  <li>
+                    <Link to="/login">Log in</Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
         </header>
         <footer>
           <p>Created by Adrian Ross</p>
         </footer>
-        {/* Usecontext open */}
         <globalContext.Provider value={{ favoritePoses, setFavoritePoses }}>
           <Outlet context={{ supabase }} />
           <ScrollRestoration />
           <Scripts />
           <LiveReload />
         </globalContext.Provider>
-        {/* UseContext close */}
       </body>
     </html>
   );
