@@ -10,6 +10,7 @@ import {
   ScrollRestoration,
   json,
   useLoaderData,
+  useNavigate,
   useRevalidator,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
