@@ -10,6 +10,7 @@ import {
   ScrollRestoration,
   json,
   useLoaderData,
+  useNavigate,
   useRevalidator,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -57,6 +58,8 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  const navigate = useNavigate();
+
   const { env, session } = useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
 
@@ -86,6 +89,17 @@ export default function App() {
 
   const [favoritePoses, setFavoritePoses] = useState<PoseRecord["id"][]>([]);
 
+  const userIsLoggedIn = session?.user;
+
+  const handleLogout = async () => {
+    await supabase.auth
+      .signOut()
+      .then(() => navigate("/"))
+      .catch((error) => {
+        throw new Error(error?.message);
+      });
+  };
+
   return (
     <html lang="en">
       <head>
@@ -103,29 +117,38 @@ export default function App() {
               <li>
                 <Link to="/">Home</Link>
               </li>
-              <li>
-                <Link to="/about">About</Link>
-              </li>
-              <li>
-                <Link to="/signup">Sign up</Link>
-              </li>
-              <li>
-                <Link to="/profile">Profile</Link>
-              </li>
+
+              {userIsLoggedIn ? (
+                <>
+                  <li>
+                    <Link to="/profile">Profile</Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}>Log out</button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link to="/signup">Sign up</Link>
+                  </li>
+                  <li>
+                    <Link to="/login">Log in</Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
         </header>
         <footer>
           <p>Created by Adrian Ross</p>
         </footer>
-        {/* Usecontext open */}
         <globalContext.Provider value={{ favoritePoses, setFavoritePoses }}>
           <Outlet context={{ supabase }} />
           <ScrollRestoration />
           <Scripts />
           <LiveReload />
         </globalContext.Provider>
-        {/* UseContext close */}
       </body>
     </html>
   );

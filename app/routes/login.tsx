@@ -5,8 +5,10 @@ import {
   useNavigate,
   useOutletContext,
 } from "@remix-run/react";
-import { createServerClient } from "@supabase/auth-helpers-remix";
-import { SupabaseClient } from "@supabase/supabase-js";
+import {
+  SupabaseClient,
+  createServerClient,
+} from "@supabase/auth-helpers-remix";
 import { useState } from "react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -32,19 +34,23 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Sign up | Yoga Poses" },
-    { name: "description", content: "Create a new account" },
+    { title: "Log in | Yoga Poses" },
+    { name: "description", content: "Log in to your account" },
   ];
 };
 
-export default function SignUp() {
+// Sign up button to sign in with Google
+// Signup form to login with email and password
+
+export default function Login() {
+  const navigate = useNavigate();
+
+  const { session } = useLoaderData<typeof loader>();
   const { supabase } = useOutletContext<{
     supabase: SupabaseClient;
   }>();
-  const { session } = useLoaderData<typeof loader>();
-  const userIsLoggedIn = Boolean(session);
 
-  const navigate = useNavigate();
+  const userIsLoggedIn = session;
 
   const [formValues, setFormValues] = useState<{
     email: string;
@@ -68,7 +74,7 @@ export default function SignUp() {
 
     const { email, password } = formValues;
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
@@ -77,7 +83,7 @@ export default function SignUp() {
       setFormErrors([error.message]);
     }
 
-    if (data.user || data.session) {
+    if (data.session) {
       navigate("/");
     }
   };
@@ -103,6 +109,7 @@ export default function SignUp() {
     <form>
       {/* TODO: Replace with React Final Form */}
       <div>
+        <h2>Log in</h2>
         <label>
           E-mail address
           <input
@@ -128,7 +135,7 @@ export default function SignUp() {
             onChange={handleInputChange}
             required
             type="text"
-            autoComplete="new-password"
+            autoComplete="current-password"
           />
         </label>
         {/* TODO: display validation errors */}
@@ -144,7 +151,7 @@ export default function SignUp() {
       <button
         type="submit"
         onClick={handleFormSubmit}
-        disabled={emptyFormFields || userIsLoggedIn}
+        disabled={emptyFormFields}
       >
         Sign up
       </button>
