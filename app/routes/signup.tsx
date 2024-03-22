@@ -1,10 +1,10 @@
+import { type MetaFunction, json, LoaderFunctionArgs } from "@remix-run/node";
 import {
-  redirect,
-  type MetaFunction,
-  json,
-  LoaderFunctionArgs,
-} from "@remix-run/node";
-import { Link, useLoaderData, useOutletContext } from "@remix-run/react";
+  Link,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from "@remix-run/react";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { useState } from "react";
@@ -41,10 +41,10 @@ export default function SignUp() {
   const { supabase } = useOutletContext<{
     supabase: SupabaseClient;
   }>();
-
   const { session } = useLoaderData<typeof loader>();
-
   const userIsLoggedIn = Boolean(session);
+
+  const navigate = useNavigate();
 
   const [formValues, setFormValues] = useState<{
     email: string;
@@ -78,7 +78,7 @@ export default function SignUp() {
     }
 
     if (data.user || data.session) {
-      redirect("http://localhost:3000/profile");
+      navigate("/");
     }
   };
 
