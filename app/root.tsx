@@ -9,7 +9,6 @@ import {
   Scripts,
   ScrollRestoration,
   json,
-  redirect,
   useLoaderData,
   useRevalidator,
 } from "@remix-run/react";
@@ -58,6 +57,8 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  const navigate = useNavigate();
+
   const { env, session } = useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
 
@@ -92,7 +93,7 @@ export default function App() {
   const handleLogout = async () => {
     await supabase.auth
       .signOut()
-      .then(() => redirect("/"))
+      .then(() => navigate("/"))
       .catch((error) => {
         throw new Error(error?.message);
       });
