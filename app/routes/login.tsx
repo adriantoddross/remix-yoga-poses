@@ -44,6 +44,7 @@ export const meta: MetaFunction = () => {
 
 export default function Login() {
   const navigate = useNavigate();
+
   const { session } = useLoaderData<typeof loader>();
   const { supabase } = useOutletContext<{
     supabase: SupabaseClient;
