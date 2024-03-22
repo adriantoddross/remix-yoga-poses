@@ -44,7 +44,7 @@ export default function SignUp() {
 
   const { session } = useLoaderData<typeof loader>();
 
-  const userIsLoggedIn = session;
+  const userIsLoggedIn = Boolean(session);
 
   const [formValues, setFormValues] = useState<{
     email: string;
@@ -112,6 +112,7 @@ export default function SignUp() {
             onChange={handleInputChange}
             required
             type="text"
+            autoComplete="email"
           />
         </label>
         {/* TODO: display validation errors */}
@@ -127,6 +128,7 @@ export default function SignUp() {
             onChange={handleInputChange}
             required
             type="text"
+            autoComplete="new-password"
           />
         </label>
         {/* TODO: display validation errors */}
