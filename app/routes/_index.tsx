@@ -2,6 +2,7 @@ import { json, type MetaFunction } from "@remix-run/node";
 import { ChangeEvent, useState } from "react";
 import { getPoses } from "../data";
 import Poses from "~/components/Poses";
+import { useLoaderData } from "@remix-run/react";
 
 // TODO: Fetch yoga poses from yoga api for the homepage
 // TODO: Set up DB table to allow users to favorite yoga poses
@@ -16,11 +17,29 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
+  // CONST for BASE_URL
+  // Fetch
+  // Return as json data
+
+  const YOGI_API_BASE_URL = "https://yoga-api-nzy4.onrender.com/v1";
+  const YOGI_API_CATEGORIES = "/categories";
+
+  console.log(`${YOGI_API_BASE_URL}${YOGI_API_CATEGORIES}`);
+  const getAllCategories = await fetch(
+    `${YOGI_API_BASE_URL}${YOGI_API_CATEGORIES}`
+  ).then((data) => data);
+
+  const allPoses = await getAllCategories.json();
+
   const posesData = await getPoses();
-  return json({ posesData });
+  return json({ posesData, allPoses });
 };
 
 export default function Index() {
+  // get poses from useLoaderData
+  const { allPoses } = useLoaderData<typeof loader>();
+  console.log(allPoses);
+
   const [filters, setFilters] = useState<string[]>([]);
   const handleToggleFilter = (
     event: ChangeEvent<HTMLInputElement> & {
