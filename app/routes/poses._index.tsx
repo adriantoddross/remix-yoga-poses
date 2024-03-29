@@ -1,8 +1,15 @@
-import { json } from "@remix-run/node";
+import { MetaFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { ChangeEvent, useCallback, useState } from "react";
 import Pose from "~/components/Pose";
 import { PoseCategory, PoseRecord } from "~/types";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Yoga Poses" },
+    { name: "description", content: "View all poses" },
+  ];
+};
 
 export async function loader() {
   const poses = await fetch(
