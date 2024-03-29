@@ -1,10 +1,9 @@
 import { json, type MetaFunction } from "@remix-run/node";
 import { ChangeEvent, useState } from "react";
-import { getPoses } from "../data";
-import Poses from "~/components/Poses";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { PoseCategory } from "~/types";
 
-// TODO: Fetch yoga poses from yoga api for the homepage
+// TODO: ✅ Fetch yoga poses from yoga api for the homepage
 // TODO: Set up DB table to allow users to favorite yoga poses
 // TODO: Filter poses by category
 // TODO: Add styling to home page, login, signup and profile page
@@ -17,28 +16,45 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  // CONST for BASE_URL
-  // Fetch
-  // Return as json data
-
-  const YOGI_API_BASE_URL = "https://yoga-api-nzy4.onrender.com/v1";
-  const YOGI_API_CATEGORIES = "/categories";
-
-  console.log(`${YOGI_API_BASE_URL}${YOGI_API_CATEGORIES}`);
   const getAllCategories = await fetch(
-    `${YOGI_API_BASE_URL}${YOGI_API_CATEGORIES}`
-  ).then((data) => data);
+    `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}`
+  ).then((categoriesData) => categoriesData);
 
-  const allPoses = await getAllCategories.json();
+  const allPosesCategories: PoseCategory[] = await getAllCategories.json();
 
-  const posesData = await getPoses();
-  return json({ posesData, allPoses });
+  return json({ allPosesCategories });
+};
+
+type PosesCategoryListProps = {
+  categories: PoseCategory[];
+};
+
+const PosesCategoryList = ({ categories }: PosesCategoryListProps) => {
+  return (
+    <ul>
+      {categories.map(
+        ({ category_description, category_name, id }: PoseCategory) => {
+          console.log(category_name);
+
+          return (
+            <li key={id}>
+              <h2>
+                {" "}
+                <Link to={`poses/category/${category_name}`}>
+                  {category_name}
+                </Link>
+              </h2>
+              <p>{category_description}</p>
+            </li>
+          );
+        }
+      )}
+    </ul>
+  );
 };
 
 export default function Index() {
-  // get poses from useLoaderData
-  const { allPoses } = useLoaderData<typeof loader>();
-  console.log(allPoses);
+  const { allPosesCategories } = useLoaderData<typeof loader>();
 
   const [filters, setFilters] = useState<string[]>([]);
   const handleToggleFilter = (
@@ -96,8 +112,8 @@ export default function Index() {
         </fieldset>
       </div>
       <div>
-        <h2>Poses</h2>
-        <Poses />
+        <h2>Poses by category</h2>
+        <PosesCategoryList categories={allPosesCategories} />
       </div>
     </div>
   );
