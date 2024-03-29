@@ -72,9 +72,13 @@ export function ErrorBoundary() {
       <body>
         <div>
           <h1>Something went wrong!</h1>
-          <p>Sorry about that...</p>
+          <p>Sorry about that.</p>
         </div>
 
+        <div>
+          <p>{error?.data}</p>
+          <p>Status code: {error?.status}</p>
+        </div>
         <Scripts />
       </body>
     </html>
