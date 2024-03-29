@@ -15,7 +15,6 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { globalContext } from "./context/globalContext";
 import {
   createBrowserClient,
   createServerClient,
@@ -114,8 +113,6 @@ export default function App() {
     };
   }, [serverAccessToken, supabase, revalidate]);
 
-  const [favoritePoses, setFavoritePoses] = useState<PoseRecord["id"][]>([]);
-
   const userIsLoggedIn = session?.user;
 
   const handleLogout = async () => {
@@ -170,12 +167,10 @@ export default function App() {
         <footer>
           <p>Created by Adrian Ross</p>
         </footer>
-        <globalContext.Provider value={{ favoritePoses, setFavoritePoses }}>
-          <Outlet context={{ supabase }} />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
-        </globalContext.Provider>
+        <Outlet context={{ supabase }} />
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
       </body>
     </html>
   );
