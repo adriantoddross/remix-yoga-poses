@@ -18,5 +18,5 @@ export type PoseCategory = {
   category_name: string;
   category_description: string;
   poses: PoseRecord[];
-  message: string; // Only present when a pose can't be found!
+  message: string; // Only present when a category can't be found!
 };
