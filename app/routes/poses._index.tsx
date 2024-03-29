@@ -31,10 +31,9 @@ export async function loader() {
 }
 
 type PosesData = {
-  poses: PoseRecord[] | PoseCategory["poses"];
+  poses: PoseRecord[];
   filters: Set<string>;
 };
-type Pose = PoseRecord & PoseCategory["poses"];
 
 export default function Category() {
   const { posesData, categoriesData } = useLoaderData<typeof loader>();

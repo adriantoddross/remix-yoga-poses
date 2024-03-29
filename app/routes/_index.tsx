@@ -1,5 +1,4 @@
 import { json, type MetaFunction } from "@remix-run/node";
-import { ChangeEvent, useState } from "react";
 import { Link, useLoaderData } from "@remix-run/react";
 import { PoseCategory } from "~/types";
 import PosesCategoryList from "~/components/PosesCategoriesList";

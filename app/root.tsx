@@ -15,7 +15,6 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { PoseRecord } from "./data";
 import { globalContext } from "./context/globalContext";
 import {
   createBrowserClient,
