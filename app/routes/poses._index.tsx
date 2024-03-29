@@ -70,7 +70,11 @@ export default function Category() {
             return filters.has(category_name);
           })
           .map(({ poses }) => poses.map((pose: PoseRecord) => pose))
-          .flat();
+          .flat()
+          .filter(
+            (pose1, index, poses) =>
+              poses.findIndex((pose2) => pose1.id === pose2.id) === index
+          );
 
         return {
           filters,
