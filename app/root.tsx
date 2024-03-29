@@ -12,6 +12,7 @@ import {
   useLoaderData,
   useNavigate,
   useRevalidator,
+  useRouteError,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { PoseRecord } from "./data";
@@ -56,6 +57,29 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+
+  return (
+    <html lang="en">
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div>
+          <h1>Something went wrong!</h1>
+          <p>Sorry about that...</p>
+        </div>
+
+        <Scripts />
+      </body>
+    </html>
+  );
+}
 
 export default function App() {
   const navigate = useNavigate();
