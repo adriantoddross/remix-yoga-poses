@@ -1,5 +1,4 @@
 export type PoseRecord = {
-  createdAt: string;
   id: number;
   english_name: string;
   sanskrit: string;
