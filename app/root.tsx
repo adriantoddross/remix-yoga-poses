@@ -1,7 +1,6 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import {
-  Link,
   Links,
   LiveReload,
   Meta,
@@ -10,41 +9,38 @@ import {
   ScrollRestoration,
   json,
   useLoaderData,
-  useNavigate,
+  useOutletContext,
   useRevalidator,
   useRouteError,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import {
+  Session,
+  SupabaseClient,
   createBrowserClient,
-  createServerClient,
 } from "@supabase/auth-helpers-remix";
+import { createSupabaseServerClient } from "./supabase/serverClient";
+import Navbar from "./components/Navbar";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-  };
-
   const response = new Response();
 
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      request,
-      response,
-    }
-  );
+  const { supabase } = createSupabaseServerClient(request);
 
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  };
+
   return json(
     {
       env,
       session,
+      userIsLoggedIn: Boolean(session?.user),
     },
     {
       headers: response.headers,
@@ -83,11 +79,20 @@ export function ErrorBoundary() {
   );
 }
 
-export default function App() {
-  const navigate = useNavigate();
+type RootContextType = {
+  supabase: SupabaseClient;
+  user?: Session["user"];
+  userIsLoggedIn: boolean;
+};
 
-  const { env, session } = useLoaderData<typeof loader>();
+export function useUser() {
+  return useOutletContext<RootContextType>();
+}
+
+export default function App() {
   const { revalidate } = useRevalidator();
+
+  const { env, session, userIsLoggedIn } = useLoaderData<typeof loader>();
 
   const [supabase] = useState(() =>
     createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
@@ -113,17 +118,6 @@ export default function App() {
     };
   }, [serverAccessToken, supabase, revalidate]);
 
-  const userIsLoggedIn = session?.user;
-
-  const handleLogout = async () => {
-    await supabase.auth
-      .signOut()
-      .then(() => navigate("/"))
-      .catch((error) => {
-        throw new Error(error?.message);
-      });
-  };
-
   return (
     <html lang="en">
       <head>
@@ -134,40 +128,19 @@ export default function App() {
       </head>
 
       <body>
-        <header>
-          <h1>Yoga Poses</h1>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-
-              {userIsLoggedIn ? (
-                <>
-                  <li>
-                    <Link to="/profile">Profile</Link>
-                  </li>
-                  <li>
-                    <button onClick={handleLogout}>Log out</button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li>
-                    <Link to="/signup">Sign up</Link>
-                  </li>
-                  <li>
-                    <Link to="/login">Log in</Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </nav>
-        </header>
+        <Navbar supabase={supabase} userIsLoggedIn={userIsLoggedIn} />
         <footer>
           <p>Created by Adrian Ross</p>
         </footer>
-        <Outlet context={{ supabase }} />
+        <Outlet
+          context={
+            {
+              supabase,
+              user: session?.user,
+              userIsLoggedIn: Boolean(session?.user),
+            } satisfies RootContextType
+          }
+        />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
