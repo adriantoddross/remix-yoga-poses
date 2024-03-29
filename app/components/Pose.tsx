@@ -1,13 +1,21 @@
 import { Link } from "@remix-run/react";
 import { PoseRecord } from "~/types";
 
-export default function Pose({ english_name, url_svg }: PoseRecord) {
+export default function Pose({ english_name, id, url_svg }: PoseRecord) {
+  const handleFavoritePose = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const { value } = event.target as HTMLButtonElement;
+
+    console.log("Favoriting pose...", value);
+  };
   return (
     <li>
       <h3>{english_name}</h3>
       <img src={url_svg} alt={`Graphic of person doing ${english_name} pose`} />
       <div>
         <Link to={`/poses/${english_name}`}>Learn more</Link>
+        <button type="button" onClick={handleFavoritePose} value={id}>
+          Favorite
+        </button>
       </div>
     </li>
   );
