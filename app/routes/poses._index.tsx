@@ -44,7 +44,6 @@ type PosesData = {
 
 export default function Category() {
   const { posesData, categoriesData } = useLoaderData<typeof loader>();
-
   const [poses, setPoses] = useState<PosesData>({
     poses: posesData,
     filters: new Set<string>(),
@@ -71,6 +70,7 @@ export default function Category() {
             poses: posesData,
           };
 
+        // Filter poses by category, flatten the category array of poses, then remove duplicate poses.
         const filteredPoses = categoriesData
           .filter(({ category_name }) => {
             return filters.has(category_name);
@@ -90,6 +90,12 @@ export default function Category() {
     },
     [setPoses, categoriesData, posesData]
   );
+
+  const handleFavoritePose = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const { value } = event.target as HTMLButtonElement;
+
+    console.log("Favoriting pose...", value);
+  };
 
   return (
     <section>
@@ -121,7 +127,9 @@ export default function Category() {
       <ul>
         {poses.poses.map((pose) => {
           const { id } = pose;
-          return <Pose key={id} {...pose} />;
+          return (
+            <Pose key={id} {...pose} handleFavoriteClick={handleFavoritePose} />
+          );
         })}
       </ul>
     </section>
