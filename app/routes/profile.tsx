@@ -3,7 +3,7 @@ import { MetaFunction } from "@remix-run/node";
 export const meta: MetaFunction = () => {
   return [
     { title: "Yoga Poses" },
-    { name: "description", content: "View favorite Yoga poses" },
+    { name: "description", content: "View your favorite Yoga poses" },
   ];
 };
 
