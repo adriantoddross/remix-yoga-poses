@@ -12,10 +12,9 @@ import {
   useLoaderData,
   useNavigate,
   useRevalidator,
+  useRouteError,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { PoseRecord } from "./data";
-import { globalContext } from "./context/globalContext";
 import {
   createBrowserClient,
   createServerClient,
@@ -57,6 +56,33 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+
+  return (
+    <html lang="en">
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div>
+          <h1>Something went wrong!</h1>
+          <p>Sorry about that.</p>
+        </div>
+
+        <div>
+          <p>Error: {error?.data}</p>
+          <p>Status code: {error?.status}</p>
+        </div>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
 export default function App() {
   const navigate = useNavigate();
 
@@ -86,8 +112,6 @@ export default function App() {
       subscription.unsubscribe();
     };
   }, [serverAccessToken, supabase, revalidate]);
-
-  const [favoritePoses, setFavoritePoses] = useState<PoseRecord["id"][]>([]);
 
   const userIsLoggedIn = session?.user;
 
@@ -143,12 +167,10 @@ export default function App() {
         <footer>
           <p>Created by Adrian Ross</p>
         </footer>
-        <globalContext.Provider value={{ favoritePoses, setFavoritePoses }}>
-          <Outlet context={{ supabase }} />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
-        </globalContext.Provider>
+        <Outlet context={{ supabase }} />
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
       </body>
     </html>
   );

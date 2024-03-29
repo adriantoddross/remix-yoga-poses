@@ -1,21 +1,14 @@
-import { PoseMutation } from "~/data";
+import { Link } from "@remix-run/react";
+import { PoseRecord } from "~/types";
 
-type PoseProps = PoseMutation & {
-  handleClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-};
-
-const Pose = ({ name, id, description, favorite, handleClick }: PoseProps) => {
+export default function Pose({ english_name, url_svg }: PoseRecord) {
   return (
-    <>
-      <h3>{favorite ? `❤️ ${name}` : name}</h3>
-      <p>{description}</p>
-      {handleClick ? (
-        <button type="button" onClick={handleClick} name={name} value={id}>
-          Like
-        </button>
-      ) : null}
-    </>
+    <li>
+      <h3>{english_name}</h3>
+      <img src={url_svg} alt={`Graphic of person doing ${english_name} pose`} />
+      <div>
+        <Link to={`/poses/${english_name}`}>Learn more</Link>
+      </div>
+    </li>
   );
-};
-
-export default Pose;
+}
