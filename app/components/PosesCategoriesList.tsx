@@ -12,8 +12,6 @@ export default function PosesCategoryList({
     <ul>
       {categories.map(
         ({ category_description, category_name, id }: PoseCategory) => {
-          console.log(category_name);
-
           return (
             <li key={id}>
               <h2>
