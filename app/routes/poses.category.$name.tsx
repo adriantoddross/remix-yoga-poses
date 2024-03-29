@@ -4,6 +4,13 @@ import invariant from "tiny-invariant";
 import Pose from "~/components/Pose";
 import { PoseCategory } from "~/types";
 
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Yoga Poses" },
+    { name: "description", content: "View categories of poses" },
+  ];
+};
+
 export async function loader({ params }: LoaderFunctionArgs) {
   invariant(params.name, "Missing category name param");
 

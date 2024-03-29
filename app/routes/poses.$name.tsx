@@ -1,7 +1,14 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { PoseRecord } from "~/types";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Yoga Poses" },
+    { name: "description", content: "View pose info" },
+  ];
+};
 
 export async function loader({ params }: LoaderFunctionArgs) {
   invariant(params.name, "Missing pose name param");
