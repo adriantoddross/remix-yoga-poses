@@ -11,11 +11,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}?name=${params.name}`
   ).then((data) => data);
 
-  if (!category) {
+  const categoryData: PoseCategory = await category.json();
+
+  if (!categoryData.poses.length) {
     throw new Response("Category not found", { status: 404 });
   }
-
-  const categoryData: PoseCategory = await category.json();
 
   return json({ categoryData });
 }

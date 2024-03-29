@@ -76,7 +76,7 @@ export function ErrorBoundary() {
         </div>
 
         <div>
-          <p>{error?.data}</p>
+          <p>Error: {error?.data}</p>
           <p>Status code: {error?.status}</p>
         </div>
         <Scripts />

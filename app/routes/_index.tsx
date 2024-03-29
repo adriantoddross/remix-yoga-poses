@@ -21,13 +21,13 @@ export const loader = async () => {
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}`
   ).then((categoriesData) => categoriesData);
 
-  if (!categories) {
+  const categoriesData: PoseCategory[] = await categories.json();
+
+  if (!categoriesData.length) {
     throw new Response("Pose categories not found; Something went wrong!", {
       status: 404,
     });
   }
-
-  const categoriesData: PoseCategory[] = await categories.json();
 
   return json({ categoriesData });
 };

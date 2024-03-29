@@ -10,11 +10,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_POSES}?name=${params.name}`
   ).then((data) => data);
 
-  if (!pose) {
+  const poseData: PoseRecord = await pose.json();
+
+  if (poseData.message) {
     throw new Response("Pose not found", { status: 404 });
   }
-
-  const poseData: PoseRecord = await pose.json();
 
   return json({ poseData });
 }
