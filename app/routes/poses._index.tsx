@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import Pose from "~/components/Pose";
 import { PoseCategory, PoseRecord } from "~/types";
 
@@ -30,31 +30,56 @@ export async function loader() {
   return json({ posesData, categoriesData });
 }
 
-type PosesData = PoseRecord[] | PoseCategory["poses"];
+type PosesData = {
+  poses: PoseRecord[] | PoseCategory["poses"];
+  filters: Set<string>;
+};
 type Pose = PoseRecord & PoseCategory["poses"];
 
 export default function Category() {
   const { posesData, categoriesData } = useLoaderData<typeof loader>();
 
-  const [poses, setPoses] = useState<PosesData>(posesData);
-  const [filters, setFilters] = useState<string[]>([]);
+  const [poses, setPoses] = useState<PosesData>({
+    poses: posesData,
+    filters: new Set<string>(),
+  });
 
-  const handleToggleFilter = (
-    event: ChangeEvent<HTMLInputElement> & {
-      currentTarget: HTMLInputElement;
-    }
-  ) => {
-    if (filters.includes(`${event.currentTarget.name}`)) {
-      setFilters(
-        [...filters].filter((name) => name !== `${event.currentTarget.name}`)
-      );
+  const handleFilterChange = useCallback(
+    (
+      event: ChangeEvent<HTMLInputElement> & {
+        currentTarget: HTMLInputElement;
+      }
+    ) => {
+      setPoses((previousState) => {
+        const filters = new Set(previousState.filters);
 
-      return console.log(`❌ ${event.currentTarget.name} checked!`);
-    }
+        if (event.target.checked) {
+          filters.add(event.target.value);
+        } else {
+          filters.delete(event.target.value);
+        }
 
-    setFilters([...filters, `${event.currentTarget.name}`]);
-    return console.log(`✅ ${event.currentTarget.name} checked!!`);
-  };
+        if (filters.size === 0)
+          return {
+            filters,
+            poses: posesData,
+          };
+
+        const filteredPoses = categoriesData
+          .filter(({ category_name }) => {
+            return filters.has(category_name);
+          })
+          .map(({ poses }) => poses.map((pose: PoseRecord) => pose))
+          .flat();
+
+        return {
+          filters,
+          poses: filteredPoses,
+        };
+      });
+    },
+    [setPoses, categoriesData, posesData]
+  );
 
   return (
     <section>
@@ -63,7 +88,7 @@ export default function Category() {
       <div>
         <fieldset>
           <legend>
-            <h2>Filters</h2>
+            <h2>Filter by category</h2>
           </legend>
 
           {categoriesData.map(({ category_name, id }) => {
@@ -74,8 +99,8 @@ export default function Category() {
                   type="checkbox"
                   name={category_name}
                   id={category_name}
-                  value={id}
-                  onChange={handleToggleFilter}
+                  value={category_name}
+                  onChange={handleFilterChange}
                 />
               </label>
             );
@@ -84,7 +109,7 @@ export default function Category() {
       </div>
 
       <ul>
-        {poses.map((pose) => {
+        {poses.poses.map((pose) => {
           const { id } = pose;
           return <Pose key={id} {...pose} />;
         })}
