@@ -1,21 +1,28 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import invariant from "tiny-invariant";
 import Pose from "~/components/Pose";
 import { PoseCategory } from "~/types";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  const getCategory = await fetch(
+  invariant(params.name, "Missing category name param");
+
+  const category = await fetch(
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}?name=${params.name}`
   ).then((data) => data);
 
-  const category: PoseCategory = await getCategory.json();
+  if (!category) {
+    throw new Response("Category not found", { status: 404 });
+  }
 
-  return json({ category });
+  const categoryData: PoseCategory = await category.json();
+
+  return json({ categoryData });
 }
 
 export default function Category() {
-  const { category } = useLoaderData<typeof loader>();
-  const { category_name, category_description, poses } = category;
+  const { categoryData } = useLoaderData<typeof loader>();
+  const { category_name, category_description, poses } = categoryData;
 
   return (
     <section>

@@ -17,17 +17,23 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const getAllCategories = await fetch(
+  const categories = await fetch(
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}`
   ).then((categoriesData) => categoriesData);
 
-  const allPosesCategories: PoseCategory[] = await getAllCategories.json();
+  if (!categories) {
+    throw new Response("Pose categories not found; Something went wrong!", {
+      status: 404,
+    });
+  }
 
-  return json({ allPosesCategories });
+  const categoriesData: PoseCategory[] = await categories.json();
+
+  return json({ categoriesData });
 };
 
 export default function Index() {
-  const { allPosesCategories } = useLoaderData<typeof loader>();
+  const { categoriesData } = useLoaderData<typeof loader>();
 
   const [filters, setFilters] = useState<string[]>([]);
   const handleToggleFilter = (
@@ -86,7 +92,7 @@ export default function Index() {
       </div>
       <div>
         <h2>Poses by category</h2>
-        <PosesCategoryList categories={allPosesCategories} />
+        <PosesCategoryList categories={categoriesData} />
       </div>
     </div>
   );

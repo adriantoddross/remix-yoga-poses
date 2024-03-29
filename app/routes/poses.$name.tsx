@@ -1,19 +1,26 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import invariant from "tiny-invariant";
 import { PoseRecord } from "~/types";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  const getPose = await fetch(
+  invariant(params.name, "Missing pose name param");
+
+  const pose = await fetch(
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_POSES}?name=${params.name}`
   ).then((data) => data);
 
-  const Pose: PoseRecord = await getPose.json();
+  if (!pose) {
+    throw new Response("Pose not found", { status: 404 });
+  }
 
-  return json({ Pose });
+  const poseData: PoseRecord = await pose.json();
+
+  return json({ poseData });
 }
 
 export default function Category() {
-  const { Pose } = useLoaderData<typeof loader>();
+  const { poseData } = useLoaderData<typeof loader>();
 
   const {
     english_name,
@@ -21,7 +28,7 @@ export default function Category() {
     pose_benefits,
     sanskrit_name,
     url_svg,
-  } = Pose;
+  } = poseData;
 
   return (
     <section>
