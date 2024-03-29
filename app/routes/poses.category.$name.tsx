@@ -1,12 +1,9 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import Pose from "~/components/Pose";
 import { PoseCategory } from "~/types";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  console.log(
-    `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}?name=${params.name}`
-  );
-
   const getCategory = await fetch(
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_CATEGORIES}?name=${params.name}`
   ).then((data) => data);
@@ -25,13 +22,9 @@ export default function Category() {
       <h2>{category_name}</h2>
       <p>{category_description}</p>
       <ul>
-        {poses.map(({ id, english_name, pose_description }) => {
-          return (
-            <li key={id}>
-              <h3>{english_name}</h3>
-              <p>{pose_description}</p>
-            </li>
-          );
+        {poses.map((pose) => {
+          const { id } = pose;
+          return <Pose key={id} {...pose} />;
         })}
       </ul>
     </section>
