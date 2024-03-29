@@ -1,6 +1,6 @@
 import { json, type MetaFunction } from "@remix-run/node";
 import { ChangeEvent, useState } from "react";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { PoseCategory } from "~/types";
 import PosesCategoryList from "~/components/PosesCategoriesList";
 
@@ -92,6 +92,7 @@ export default function Index() {
       </div>
       <div>
         <h2>Poses by category</h2>
+        <Link to="/poses">View all poses</Link>
         <PosesCategoryList categories={categoriesData} />
       </div>
     </div>
