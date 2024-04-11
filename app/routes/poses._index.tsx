@@ -1,8 +1,9 @@
-import { MetaFunction, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { ActionFunctionArgs, MetaFunction, json } from "@remix-run/node";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { ChangeEvent, useCallback, useState } from "react";
 import Pose from "~/components/Pose";
 import { PoseCategory, PoseRecord } from "~/types";
+import { createSupabaseServerClient } from "../supabase/serverClient";
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,6 +11,36 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "View all poses" },
   ];
 };
+
+export async function action({ request }: ActionFunctionArgs) {
+  const { supabase } = createSupabaseServerClient(request);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const body = await request.formData();
+  const poseId = body.get("pose_id");
+  const userId = session?.user.id;
+
+  const { error } = await supabase
+    .from("favorite_poses")
+    .insert([{ pose_id: poseId, user_id: userId }])
+    .select("*");
+
+  if (error?.code === "23505") {
+    // If we receive a unique key constraint error, remove the Favorite pose instead.
+    console.log("REMOVING POSE ID", poseId, "FROM USER", userId);
+    const { error } = await supabase
+      .from("favorite_poses")
+      .delete()
+      .eq("pose_id", poseId)
+      .eq("user_id", userId);
+
+    return error;
+  }
+
+  return error; // TODO: Handle errors...
+}
 
 export async function loader() {
   const poses = await fetch(
@@ -48,6 +79,8 @@ export default function Category() {
     poses: posesData,
     filters: new Set<string>(),
   });
+
+  const fetcher = useFetcher();
 
   const handleFilterChange = useCallback(
     (
@@ -91,12 +124,6 @@ export default function Category() {
     [setPoses, categoriesData, posesData]
   );
 
-  const handleFavoritePose = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const { value } = event.target as HTMLButtonElement;
-
-    console.log("Favoriting pose...", value);
-  };
-
   return (
     <section>
       <h2>Poses</h2>
@@ -124,14 +151,14 @@ export default function Category() {
         </fieldset>
       </div>
 
-      <ul>
-        {poses.poses.map((pose) => {
-          const { id } = pose;
-          return (
-            <Pose key={id} {...pose} handleFavoriteClick={handleFavoritePose} />
-          );
-        })}
-      </ul>
+      <fetcher.Form method="post">
+        <ul>
+          {poses.poses.map((pose) => {
+            const { id } = pose;
+            return <Pose key={id} {...pose} />;
+          })}
+        </ul>
+      </fetcher.Form>
     </section>
   );
 }
