@@ -69,10 +69,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     .select()
     .eq("user_id", session?.user.id);
 
-  if (!error) {
-    throw new Response("There was a problem with favoriting a pose.", {
-      status: 500,
-    });
+  if (error) {
+    throw new Response(
+      error.message ?? "There was a problem with favoriting a pose.",
+      {
+        status: 500,
+      }
+    );
   }
 
   if (!poses) {
@@ -110,6 +113,13 @@ export default function Category() {
 
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
+  const isFavoritePose = (poseId: number) => {
+    if (favoritePoses.length === 0) return false;
+
+    return fetcher.formData
+      ? fetcher.formData.get("pose_id") === poseId.toString()
+      : !!favoritePoses?.includes(poseId);
+  };
 
   const handleFilterChange = useCallback(
     (
@@ -187,7 +197,7 @@ export default function Category() {
             return (
               <Pose
                 key={id}
-                isFavorited={isSubmitting || !!favoritePoses?.includes(pose.id)}
+                isFavorited={isSubmitting || isFavoritePose(pose.id)}
                 {...pose}
               />
             );
