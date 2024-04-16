@@ -1,4 +1,9 @@
-import { ActionFunctionArgs, MetaFunction, json } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+  json,
+} from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { ChangeEvent, useCallback, useState } from "react";
 import Pose from "~/components/Pose";
@@ -29,7 +34,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (error?.code === "23505") {
     // If we receive a unique key constraint error, remove the Favorite pose instead.
-    console.log("REMOVING POSE ID", poseId, "FROM USER", userId);
     const { error } = await supabase
       .from("favorite_poses")
       .delete()
@@ -39,10 +43,15 @@ export async function action({ request }: ActionFunctionArgs) {
     return error;
   }
 
-  return error; // TODO: Handle errors...
+  return error;
 }
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = createSupabaseServerClient(request);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   const poses = await fetch(
     `${process.env.YOGA_API_BASE_URL}${process.env.YOGA_API_POSES}`
   ).then((data) => data);
@@ -55,8 +64,21 @@ export async function loader() {
 
   const posesData: PoseRecord[] = await poses.json();
 
+  const { data, error } = await supabase
+    .from("favorite_poses")
+    .select()
+    .eq("user_id", session?.user.id);
+
+  if (!error) {
+    throw new Response("There was a problem with favoriting a pose.", {
+      status: 500,
+    });
+  }
+
   if (!poses) {
-    throw new Response("Poses not found", { status: 404 });
+    throw new Response("Poses not found; Something went wrong!", {
+      status: 404,
+    });
   }
 
   if (!categoriesData.length) {
@@ -65,7 +87,12 @@ export async function loader() {
     });
   }
 
-  return json({ posesData, categoriesData });
+  return json({
+    posesData,
+    categoriesData,
+    favoritePoses: data?.map((pose) => pose.pose_id),
+    // favoritePosesError: error,
+  });
 }
 
 type PosesData = {
@@ -74,13 +101,15 @@ type PosesData = {
 };
 
 export default function Category() {
-  const { posesData, categoriesData } = useLoaderData<typeof loader>();
+  const { posesData, categoriesData, favoritePoses } =
+    useLoaderData<typeof loader>();
   const [poses, setPoses] = useState<PosesData>({
     poses: posesData,
     filters: new Set<string>(),
   });
 
   const fetcher = useFetcher();
+  const isSubmitting = fetcher.state === "submitting";
 
   const handleFilterChange = useCallback(
     (
@@ -155,7 +184,13 @@ export default function Category() {
         <ul>
           {poses.poses.map((pose) => {
             const { id } = pose;
-            return <Pose key={id} {...pose} />;
+            return (
+              <Pose
+                key={id}
+                isFavorited={isSubmitting || !!favoritePoses?.includes(pose.id)}
+                {...pose}
+              />
+            );
           })}
         </ul>
       </fetcher.Form>
