@@ -1,5 +1,6 @@
 export type PoseRecord = {
   id: number;
+  isFavorited?: boolean;
   english_name: string;
   sanskrit: string;
   sanskrit_name_adapted: string;
