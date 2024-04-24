@@ -21,3 +21,8 @@ export type PoseCategory = {
   poses: PoseRecord[];
   message: string; // Only present when a category can't be found!
 };
+
+export type PosesData = {
+  poses: PoseRecord[];
+  filters: Set<string>;
+};

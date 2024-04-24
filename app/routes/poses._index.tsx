@@ -7,7 +7,7 @@ import {
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { ChangeEvent, useCallback, useState } from "react";
 import Pose from "~/components/Pose";
-import { PoseCategory, PoseRecord } from "~/types";
+import { PoseCategory, PoseRecord, PosesData } from "~/types";
 import { createSupabaseServerClient } from "../supabase/serverClient";
 import { getFavoritePoses } from "~/supabase/clientQueries";
 import { fetchCategories, fetchPoses } from "~/api/posesApi";
@@ -93,11 +93,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     favoritePoses,
   });
 }
-
-type PosesData = {
-  poses: PoseRecord[];
-  filters: Set<string>;
-};
 
 export default function Category() {
   const { posesData, categoriesData, favoritePoses } =
