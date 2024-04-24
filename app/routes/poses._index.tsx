@@ -5,13 +5,14 @@ import {
   json,
 } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { ChangeEvent, useCallback, useState } from "react";
+import { useState } from "react";
 import Pose from "~/components/Pose";
 import { PoseCategory, PoseRecord, PosesData } from "~/types";
 import { createSupabaseServerClient } from "../supabase/serverClient";
 import { getFavoritePoses } from "~/supabase/clientQueries";
 import { fetchCategories, fetchPoses } from "~/api/posesApi";
 import { useUser } from "~/root";
+import PosesFilters from "~/components/PoseFilters";
 
 export const meta: MetaFunction = () => {
   return [
@@ -106,74 +107,15 @@ export default function Category() {
     filters: new Set<string>(),
   });
 
-  const handleFilterChange = useCallback(
-    (
-      event: ChangeEvent<HTMLInputElement> & {
-        currentTarget: HTMLInputElement;
-      }
-    ) => {
-      setPoses((previousState) => {
-        const filters = new Set(previousState.filters);
-
-        if (event.target.checked) {
-          filters.add(event.target.value);
-        } else {
-          filters.delete(event.target.value);
-        }
-
-        if (filters.size === 0)
-          return {
-            filters,
-            poses: posesData,
-          };
-
-        // Filter poses by category, flatten the category array of poses, then remove duplicate poses.
-        const filteredPoses = categoriesData
-          .filter(({ category_name }) => {
-            return filters.has(category_name);
-          })
-          .map(({ poses }) => poses.map((pose: PoseRecord) => pose))
-          .flat()
-          .filter(
-            (pose1, index, poses) =>
-              poses.findIndex((pose2) => pose1.id === pose2.id) === index
-          );
-
-        return {
-          filters,
-          poses: filteredPoses,
-        };
-      });
-    },
-    [setPoses, categoriesData, posesData]
-  );
-
   return (
     <section>
       <h2>Poses</h2>
 
-      <div>
-        <fieldset>
-          <legend>
-            <h2>Filter by category</h2>
-          </legend>
-
-          {categoriesData.map(({ category_name, id }) => {
-            return (
-              <label key={id}>
-                {category_name}
-                <input
-                  type="checkbox"
-                  name={category_name}
-                  id={category_name}
-                  value={category_name}
-                  onChange={handleFilterChange}
-                />
-              </label>
-            );
-          })}
-        </fieldset>
-      </div>
+      <PosesFilters
+        setStateAction={setPoses}
+        posesData={posesData}
+        categoriesData={categoriesData}
+      />
 
       {userIsLoggedIn ? (
         <fetcher.Form method="post">
