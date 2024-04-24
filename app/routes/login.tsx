@@ -31,6 +31,7 @@ export default function Login() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     // TODO: handle validation errors
+    // TODO: Refactor to use route action
     e.preventDefault();
     resetFormValues();
 
