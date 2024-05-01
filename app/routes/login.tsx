@@ -1,36 +1,7 @@
-import { type MetaFunction, json, LoaderFunctionArgs } from "@remix-run/node";
-import {
-  Link,
-  useLoaderData,
-  useNavigate,
-  useOutletContext,
-} from "@remix-run/react";
-import {
-  SupabaseClient,
-  createServerClient,
-} from "@supabase/auth-helpers-remix";
+import { type MetaFunction } from "@remix-run/node";
+import { Link, useNavigate } from "@remix-run/react";
 import { useState } from "react";
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const response = new Response();
-
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      request,
-      response,
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  return json({
-    session,
-  });
-};
+import { useUser } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -39,18 +10,9 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-// Sign up button to sign in with Google
-// Signup form to login with email and password
-
 export default function Login() {
   const navigate = useNavigate();
-
-  const { session } = useLoaderData<typeof loader>();
-  const { supabase } = useOutletContext<{
-    supabase: SupabaseClient;
-  }>();
-
-  const userIsLoggedIn = session;
+  const { supabase, userIsLoggedIn } = useUser();
 
   const [formValues, setFormValues] = useState<{
     email: string;
@@ -69,12 +31,16 @@ export default function Login() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     // TODO: handle validation errors
+    // TODO: Refactor to use route action
     e.preventDefault();
     resetFormValues();
 
     const { email, password } = formValues;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
@@ -83,7 +49,7 @@ export default function Login() {
       setFormErrors([error.message]);
     }
 
-    if (data.session) {
+    if (session) {
       navigate("/");
     }
   };

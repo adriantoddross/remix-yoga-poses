@@ -1,34 +1,8 @@
-import { type MetaFunction, json, LoaderFunctionArgs } from "@remix-run/node";
-import {
-  Link,
-  useLoaderData,
-  useNavigate,
-  useOutletContext,
-} from "@remix-run/react";
-import { createServerClient } from "@supabase/auth-helpers-remix";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { type MetaFunction } from "@remix-run/node";
+import { Link, useNavigate } from "@remix-run/react";
+
 import { useState } from "react";
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const response = new Response();
-
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      request,
-      response,
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  return json({
-    session,
-  });
-};
+import { useUser } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,12 +12,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function SignUp() {
-  const { supabase } = useOutletContext<{
-    supabase: SupabaseClient;
-  }>();
-  const { session } = useLoaderData<typeof loader>();
-  const userIsLoggedIn = Boolean(session);
-
+  const { supabase, userIsLoggedIn } = useUser();
   const navigate = useNavigate();
 
   const [formValues, setFormValues] = useState<{

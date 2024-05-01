@@ -3,9 +3,7 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { PoseCategory } from "~/types";
 import PosesCategoryList from "~/components/PosesCategoriesList";
 
-// TODO: ✅ Fetch yoga poses from yoga api for the homepage
-// TODO: Set up DB table to allow users to favorite yoga poses
-// TODO: ✅ Filter poses by category
+// TODO: Fetch poses & fav poses on profile page
 // TODO: Add styling to home page, login, signup and profile page
 
 export const meta: MetaFunction = () => {

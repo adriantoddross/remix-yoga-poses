@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs, MetaFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import PoseDetails from "~/components/PoseDetails";
 import { PoseRecord } from "~/types";
 
 export const meta: MetaFunction = () => {
@@ -26,37 +27,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return json({ poseData });
 }
 
-export default function Category() {
+export default function Pose() {
   const { poseData } = useLoaderData<typeof loader>();
 
-  const {
-    english_name,
-    pose_description,
-    pose_benefits,
-    sanskrit_name,
-    url_svg,
-  } = poseData;
-
-  return (
-    <section>
-      <div>
-        <h2>{english_name}</h2>
-        <h3>{sanskrit_name}</h3>
-        <img
-          src={url_svg}
-          alt={`Graphic of person doing ${english_name} pose`}
-        />
-      </div>
-
-      <section>
-        <h3>Description</h3>
-        <p>{pose_description}</p>
-      </section>
-
-      <section>
-        <h3>Benefits</h3>
-        <p>{pose_benefits}</p>
-      </section>
-    </section>
-  );
+  return <PoseDetails {...poseData} />;
 }

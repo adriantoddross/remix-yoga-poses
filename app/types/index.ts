@@ -1,5 +1,6 @@
 export type PoseRecord = {
   id: number;
+  isFavorited?: boolean;
   english_name: string;
   sanskrit: string;
   sanskrit_name_adapted: string;
@@ -19,4 +20,9 @@ export type PoseCategory = {
   category_description: string;
   poses: PoseRecord[];
   message: string; // Only present when a category can't be found!
+};
+
+export type PosesData = {
+  poses: PoseRecord[];
+  filters: Set<string>;
 };
